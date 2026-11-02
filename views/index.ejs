@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>r-home crafting | Plots & Land</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
+      <a href="/" class="font-bold text-xl tracking-tight text-amber-400">r-home crafting</a>
+      
+      <div>
+        <% if (isAdmin) { %>
+          <a href="/add" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs sm:text-sm mr-2">
+            + ज़मीन लिस्ट करें
+          </a>
+          <a href="/admin/logout" class="text-rose-400 hover:text-rose-300 text-xs sm:text-sm font-semibold">Logout</a>
+        <% } else { %>
+          <a href="/admin/login" class="text-slate-400 hover:text-white text-xs font-semibold">Admin Portal</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">वेरिफाइड प्लॉट्स और ज़मीन</h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1">प्लॉट पर क्लिक करके पूरी जानकारी देखें या सीधे WhatsApp पर बात करें</p>
+    </div>
+
+    <!-- Cards Grid -->
+    <% if (lands.length === 0) { %>
+      <div class="bg-white rounded-2xl p-10 text-center border border-slate-200 max-w-sm mx-auto">
+        <p class="text-slate-500 text-sm">फिलहाल कोई ज़मीन लिस्टेड नहीं है।</p>
+        <% if (isAdmin) { %>
+          <a href="/add" class="inline-block mt-3 text-amber-600 font-bold text-xs underline">प्लॉट लिस्ट करें →</a>
+        <% } %>
+      </div>
+    <% } else { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% lands.forEach(land => { %>
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-slate-200 flex flex-col justify-between transition">
+            
+            <!-- Clickable Card Body (Detail View) -->
+            <a href="/property/<%= land._id %>" class="block group cursor-pointer">
+              <div class="relative h-48 w-full bg-slate-200 overflow-hidden">
+                <img 
+                  src="<%= land.image %>" 
+                  alt="<%= land.title %>"
+                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80';"
+                >
+                <div class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-xs font-bold">
+                  ₹<%= Number(land.price).toLocaleString('en-IN') %>
+                </div>
+              </div>
+
+              <div class="p-4">
+                <h2 class="font-bold text-slate-900 text-base leading-tight truncate capitalize group-hover:text-amber-600 transition"><%= land.title %></h2>
+                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                  <span>📍</span>
+                  <span class="truncate"><%= land.location %></span>
+                </p>
+                <div class="mt-2.5 bg-slate-50 border border-slate-100 p-2 rounded-lg flex items-center justify-between text-xs text-slate-600 font-medium">
+                  <span>साइज/एरिया:</span>
+                  <span class="font-bold text-slate-800"><%= land.size %></span>
+                </div>
+                <p class="text-[11px] text-amber-600 font-semibold mt-2">विवरण और फोटो देखने के लिए क्लिक करें →</p>
+              </div>
+            </a>
+
+            <!-- Buttons -->
+            <div class="p-4 pt-0 space-y-2">
+              <a 
+                href="https://wa.me/<%= land.whatsapp %>?text=नमस्ते,%20मैं%20'r-home%20crafting'%20पर%20लिस्टेड%20इस%20प्रॉपर्टी%20के%20बारे%20में%20जानना%20चाहता%20हूँ:%20<%= encodeURIComponent(land.title) %>%20(<%= encodeURIComponent(land.location) %>)%20-%20₹<%= land.price %>" 
+                target="_blank" 
+                class="w-full flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-xl text-xs sm:text-sm transition shadow-sm">
+                <span>💬 WhatsApp पर बात करें</span>
+              </a>
+
+              <% if (isAdmin) { %>
+                <form action="/delete/<%= land._id %>" method="POST" onsubmit="return confirm('क्या आप वाकई इस लिस्टिंग को हटाना चाहते हैं?');">
+                  <button type="submit" class="w-full py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-semibold transition">
+                    🗑️ डिलीट करें
+                  </button>
+                </form>
+              <% } %>
+            </div>
+
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </main>
+
+</body>
+</html>
